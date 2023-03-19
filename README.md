@@ -33,6 +33,7 @@ If you have the space I would recommend to use a Raspberry Pi 3 or 4 together wi
 
 ## The manual setup
 
+#### Operating system
 The first step is to copy an operating system image on our SD card. For convenience reasons I decided for : Raspbian 11 (bullseye) 32 bit Desktop (Server instead of Desktop would also have worked out easily)
 Connect your screen/keyboard/mouse to your Raspberry Pi and boot it up and go through the initial configuration.
 (For the username I chose "ubuntu", I also configured the wifi connection for installing our required updates and software)
@@ -43,12 +44,17 @@ Using the raspi-config I further configured follow settings :
 * Enable camera interface
 * Change boot to console instead of UI
 
+I furter manually done following :
+* add : "enable_uart=1" into  /boot/config.txt
+
 The next step is to do an initial upgrade (might take some time on the Pi Zero, might be worth to run it in a termux or screen session)
 
 ```
 apt-get update
 apt-get upgrade -y
-``` 
+```
+
+#### Setup LTE modem
 
 Second step is to configure our LTE modem :
 
@@ -61,3 +67,43 @@ Assuming you have already prepared the following :
 
 Also see https://www.waveshare.com/wiki/SIM7600E-H_4G_HAT
 
+We download the sample code for the LTE modem from waveshare : https://www.waveshare.com/wiki/File:SIM7600X-4G-HAT-Demo.7z
+(If the website is already down in the meantime hit me up, I might still have the necessary file lying around)
+
+Afterwards we actually follow the tutorial to install the modem beneath a Raspberry Pi, in summary : 
+
+```
+# install 7zip
+apt-get install p7zip-full
+
+# unpack the example code
+7z x SIM7600X-4G-HAT-Demo.7z -r -o/home/ubuntu
+
+# After decompression, rename the c folder under the Raspberry folder to SIM7600X and copy it to your home folder
+
+chmod 777 sim7600_4G_hat_init
+
+# add following line to /etc/rc.local : sh /home/ubuntu/SIM7600X/sim7600_4G_hat_init
+
+# in /boot/config.txt also set : enable_uart=1
+
+# Go to the bcm2835 directory, compile and install it
+chmod +x configure && ./configure && sudo make && sudo make install
+
+# I had issues the last time, aclocal-1.13 apparently was not found
+# had to use autoreconf --force --install to be able to compile the code
+
+# If there are compilation problems you might need to clear the original executable file
+make clean
+# and to recompile
+make
+
+# Further installed libqmi utils and udhcpc :
+apt install libqmi-utils && udhcpc
+
+apt dist-upgrade -y
+sudo rpi-update
+```
+
+Before you can really use the LTE modem, you might also need to configure the APN settings to match your mobile network provider.
+If you intend to play around with the GSM support I would recommend you to install minicom, these modules can do a lot of stuff and we are really just barely scratching the surface.
