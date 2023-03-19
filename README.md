@@ -57,7 +57,7 @@ Assuming you have already prepared the following :
 * Connected the SIM7600X-4G-HAT using the IO pins
 * Connected a USB cable from Raspberry Pi towards the LTE modem.
 
-![Not yet finished Raspberry Pi LTE securiy camera in a wood box](pictures/finished.png?raw=true "Not yet ready RPI LTE security camera")
+![Not yet finished Raspberry Pi LTE securiy camera in a wood box](pictures/unfinished.png?raw=true "Not yet ready RPI LTE security camera")
 
 Also see https://www.waveshare.com/wiki/SIM7600E-H_4G_HAT
 
