@@ -53,6 +53,17 @@ apt-get update
 apt-get upgrade -y
 ```
 
+Lets also disable daily updates to be sure not to use too much mobile data once deployed : 
+
+```
+sudo systemctl stop apt-daily.timer
+sudo systemctl disable apt-daily.timer
+sudo systemctl mask apt-daily.timer
+sudo systemctl stop apt-daily-upgrade.timer
+sudo systemctl disable apt-daily-upgrade.timer
+sudo systemctl mask apt-daily-upgrade.timer
+```
+
 #### Setup LTE modem
 
 Second step is to configure our LTE modem :
@@ -129,6 +140,48 @@ Depending on your usecase you might still need to disable network or modem manag
 Before you can really use the LTE modem, it might also be necessary to configure the APN settings to match your mobile network provider (for me it worked out of the box).
 These modules can do a lot of stuff and we are really just barely scratching the surface with this project.
 
+In rndis mode I can see the following : 
+
+```
+root@picam:/var/log# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: usb0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN group default qlen 1000
+    link/ether 86:ba:c7:f9:d2:b5 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.225.24/24 brd 192.168.225.255 scope global dynamic noprefixroute usb0
+       valid_lft 39064sec preferred_lft 33664sec
+    inet6 2a02:3032:208:e82:ade7:b6a5:fa4a:9de2/64 scope global mngtmpaddr noprefixroute
+       valid_lft forever preferred_lft forever
+    inet6 fe80::e664:5ce:3cba:7c8a/64 scope link
+       valid_lft forever preferred_lft forever
+3: wlan0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether b8:27:eb:f9:c7:0f brd ff:ff:ff:ff:ff:ff
+    inet 192.168.178.75/24 brd 192.168.178.255 scope global dynamic noprefixroute wlan0
+       valid_lft 861261sec preferred_lft 753261sec
+    inet6 fe80::9545:b9b3:e84c:4b28/64 scope link
+       valid_lft forever preferred_lft forever
+
+root@picam:/var/log# ip ro
+default via 192.168.225.1 dev usb0 proto dhcp src 192.168.225.24 metric 202 mtu 1500
+default via 192.168.178.1 dev wlan0 proto dhcp src 192.168.178.75 metric 303
+192.168.178.0/24 dev wlan0 proto dhcp scope link src 192.168.178.75 metric 303
+192.168.225.0/24 dev usb0 proto dhcp scope link src 192.168.225.24 metric 202 mtu 1500
+
+root@picam:/var/log# ping -I usb0 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) from 192.168.225.24 usb0: 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=113 time=51.8 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=113 time=40.1 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=113 time=38.4 ms
+64 bytes from 8.8.8.8: icmp_seq=4 ttl=113 time=36.4 ms
+^C
+--- 8.8.8.8 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3005ms
+rtt min/avg/max/mdev = 36.382/41.660/51.776/5.988 ms
+```
 
 #### Motioneye
 
@@ -142,7 +195,7 @@ The camera integration is also easily done, the configuration options of the sof
 ![motioneye screen with configured camera](pictures/motioneye.png?raw=true "motioneye UI in webbrowser with configured camera")
 
 I have saved myself a few variants of the camera configuration from /etc/motioneye directory (versions with and without motion detection and working schedule) so I can turn things on or off from the distance without needing an UI.
-Depending on what SBC you use you might want to lower your camera resolution, for the Raspberry Pi Zero I have gone with the lowest (320x200).
+Depending on what SBC you use you might want to lower your camera resolution, for the Raspberry Pi Zero I have gone with the lowest (320x200 & 2 fps).
 
 #### Telegram integration
 
@@ -154,6 +207,14 @@ Its very well explained on their package page : https://pypi.org/project/telegra
 All we will need is the bot token and a device to talk to the bot (e.g. your Smartphone with Telegram App installed)
 Motioneye will run beneath the root user, so be sure to be root when configuring telegram-send
 
+```
+# Depending if you want to send messages to your personal Telegram or a group :
+# You might also have configured a different user
+sudo -H -u motion bash -c "telegram-send --configure"
+sudo -H -u motion bash -c "telegram-send --configure-group"
+```
+
+If you by accident already have teleterm running you might need to stop it for the duration until you have configured telegram-send.
 
 * Installation and configuration of teleterm
 Installation instructions are clear on : https://github.com/alfiankan/teleterm
@@ -177,3 +238,5 @@ whitelist:
 In the end the CPU/Memory usage is ok when idling, but if motioneye captures videos/pictures the Raspberry Pi noticeable slows down.
 
 ![htop terminal output of Raspberry Pi Zero when idling](pictures/htop.png?raw=true "htop output when idling")
+
+When there is movement in front of the camera cpu usage spikes up to 80% for me, afterwards if a video is being recorded + saved we already hit 100% for a short duration.
