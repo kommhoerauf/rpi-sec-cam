@@ -139,7 +139,7 @@ Its straight forward, just needs python2 pip but works like a charm afterwards.
 
 The camera integration is also easily done, the configuration options of the software are huge!
 
-![motioneye screen with configured camera](pictures/unfinished.png?raw=true "motioneye UI in webbrowser with configured camera")
+![motioneye screen with configured camera](pictures/htop.png?raw=true "motioneye UI in webbrowser with configured camera")
 
 I have saved myself a few variants of the camera configuration from /etc/motioneye directory (versions with and without motion detection and working schedule) so I can turn things on or off from the distance without needing an UI.
 
@@ -155,4 +155,4 @@ I have saved myself a few variants of the camera configuration from /etc/motione
 
 In the end the CPU/Memory usage is ok when idling, but if motioneye captures videos/pictures the Raspberry Pi noticeable slows down.
 
-![htop terminal output of raspberry pi zero when idling](pictures/unfinished.png?raw=true "htop output when idling")
+![htop terminal output of raspberry pi zero when idling](pictures/motioneye.png?raw=true "htop output when idling")
