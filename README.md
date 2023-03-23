@@ -8,14 +8,14 @@ We do not have wifi in the allotment, so the choice was using the mobile network
 ![Finished Raspberry Pi LTE securiy camera in a wood box](pictures/finished.png?raw=true "RPI LTE security camera")
 
 What you will need : 
-* A Raspberry Pi single board computer (or other comparable SBCs, for this project I am using a Raspberry Pi Zero W)
-* A micro SD card (which we use to install Raspbian (Debian 11) 32 bit OS, I have gone with 32GB to have some space for media files)
-* A micro USB cable to provide power to our SBC (I chose a 1A USB wall charger)
-* A LTE modem compatible with your SBC (for this project I have chosen the SIM7600X-4G-HAT (would also have been possible to choose the specific variant for the Pi Zero (SIM7600G-H)))
-* A USB cable to connect the LTE Modem to our SBC (Had to use this as I was not being able to get the LTE connection working without it, only got GSM working with IO pins)
-* A SIM card to be used with the LTE modem (I have chosen to go the cheapest german mobile phone provider plan (~200 MB free per month but getting ads))
-* A Raspberry Pi camera (I used the Raspberry Pi Zero camera without IR filter)
-* A container for everything (I chose a small and tightly fitting wood box for this)
+* A Raspberry Pi single board computer (or other comparable SBCs, for this project I am using a Raspberry Pi Zero W) ~ 20€ (if you get a good deal nowadays)
+* A micro SD card (which we use to install Raspbian (Debian 11) 32 bit OS, I have gone with 32GB to have some space for media files) ~ 10€
+* A micro USB cable to provide power to our SBC (I chose a 1A USB wall charger) ~ 10€
+* A LTE modem compatible with your SBC (for this project I have chosen the SIM7600X-4G-HAT (would also have been possible to choose the specific variant for the Pi Zero (SIM7600G-H))) ~ 90€
+* A USB cable to connect the LTE Modem to our SBC (Had to use this as I was not being able to get the LTE connection working without it, only got GSM working with IO pins) ~ 0€, its included for the SIM7600X, but depending on your container for the camera you might need angled connectors (as I did)
+* A SIM card to be used with the LTE modem (I have chosen to go the cheapest german mobile phone provider plan (~200 MB free per month but getting ads)) ~ 0€ (depending on your mobile network provider you have monthly costs)
+* A Raspberry Pi camera (I used the Raspberry Pi Zero camera without IR filter) ~ 10€
+* A container for everything (I chose a small and tightly fitting wood box for this) ~ 5€
 
 Software we will make use of : 
 * motioneye (used to operate our security camera) - https://github.com/motioneye-project/motioneye
@@ -26,6 +26,7 @@ Software we will make use of :
 Optional additions : 
 * fail2ban (might be obsolete as no ports are directly reachable through mobile network)
 * dyndns (might be obsolete, it works to store the mobile IP but as no ports are open you gain nothing)
+* ufw (might be obsolete, ports are not reachable from the mobile network)
 
 If you have the space I would recommend to use a Raspberry Pi 3 or 4 together with a SSD for storage instead of a SD card.
 A lot of writes on the SD card will render it useless quite fast. You may also think about storing the media files of motioneye on an online storage instead.
@@ -102,7 +103,7 @@ chmod +x configure && ./configure && sudo make && sudo make install
 make clean
 # and to recompile
 make
-'''
+``` 
 
 Coming back to the non obsolete parts : 
 
@@ -127,3 +128,31 @@ Depending on your usecase you might still need to disable network or modem manag
 
 Before you can really use the LTE modem, it might also be necessary to configure the APN settings to match your mobile network provider (for me it worked out of the box).
 These modules can do a lot of stuff and we are really just barely scratching the surface with this project.
+
+
+#### Motioneye
+
+The software heart of this project. There are preinstalled images with this software but we will set it up manually.
+
+We are following the wiki installation instructions : https://github.com/motioneye-project/motioneye/wiki for a Debian 11 installation (as we chose a Raspbian 11 (bullseye) OS in the beginning).
+Its straight forward, just needs python2 pip but works like a charm afterwards.
+
+The camera integration is also easily done, the configuration options of the software are huge!
+
+![motioneye screen with configured camera](pictures/unfinished.png?raw=true "motioneye UI in webbrowser with configured camera")
+
+I have saved myself a few variants of the camera configuration from /etc/motioneye directory (versions with and without motion detection and working schedule) so I can turn things on or off from the distance without needing an UI.
+
+#### Telegram integration
+
+* Setting up telegram bot
+
+* Installation and configuration of telegram-send
+
+* Installation and configuration of teleterm
+
+#### Performance
+
+In the end the CPU/Memory usage is ok when idling, but if motioneye captures videos/pictures the Raspberry Pi noticeable slows down.
+
+![htop terminal output of raspberry pi zero when idling](pictures/unfinished.png?raw=true "htop output when idling")
