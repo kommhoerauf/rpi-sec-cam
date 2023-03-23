@@ -60,7 +60,7 @@ Second step is to configure our LTE modem :
 Assuming you have already prepared the following : 
 * SIM card with PIN disabled
 * Connected the SIM7600X-4G-HAT using the IO pins
-* Set the correct jumper positions (to configure the module for raspberry pi and boot it up at the same time)
+* Set the correct jumper positions (to configure the module for Raspberry Pi and boot it up at the same time)
 * Connected an USB cable from Raspberry Pi towards the LTE modem.
 
 ![Not yet finished Raspberry Pi LTE securiy camera in a wood box](pictures/unfinished.png?raw=true "Not yet ready RPI LTE security camera")
@@ -139,20 +139,41 @@ Its straight forward, just needs python2 pip but works like a charm afterwards.
 
 The camera integration is also easily done, the configuration options of the software are huge!
 
-![motioneye screen with configured camera](pictures/htop.png?raw=true "motioneye UI in webbrowser with configured camera")
+![motioneye screen with configured camera](pictures/motioneye.png?raw=true "motioneye UI in webbrowser with configured camera")
 
 I have saved myself a few variants of the camera configuration from /etc/motioneye directory (versions with and without motion detection and working schedule) so I can turn things on or off from the distance without needing an UI.
+Depending on what SBC you use you might want to lower your camera resolution, for the Raspberry Pi Zero I have gone with the lowest (320x200).
 
 #### Telegram integration
 
 * Setting up telegram bot
+TBD
 
 * Installation and configuration of telegram-send
+Its very well explained on their package page : https://pypi.org/project/telegram-send/
+All we will need is the bot token and a device to talk to the bot (e.g. your Smartphone with Telegram App installed)
+Motioneye will run beneath the root user, so be sure to be root when configuring telegram-send
+
 
 * Installation and configuration of teleterm
+Installation instructions are clear on : https://github.com/alfiankan/teleterm
+Be sure to have go version (at least) 1.18 installed and compile the code directly on your Raspberry Pi (took a few minutes for the Pi Zero ;-))
+We are kind of installing a backdoor here, be aware there might be better solutions, its just a personal preference which came in quite handy.
+
+
+We further need to whitelist your Telegram contact (you will need your telegram user id here) to be allowed to send commands. You do not want anybody to have root access to your remote Pi
+
+```
+ubuntu@picam:~ $ cat ~/.teleterm/config.yaml
+teleterm:
+  telegram_token: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  shell_executor: "/bin/bash"
+whitelist:
+  - 123456789
+```
 
 #### Performance
 
 In the end the CPU/Memory usage is ok when idling, but if motioneye captures videos/pictures the Raspberry Pi noticeable slows down.
 
-![htop terminal output of raspberry pi zero when idling](pictures/motioneye.png?raw=true "htop output when idling")
+![htop terminal output of Raspberry Pi Zero when idling](pictures/htop.png?raw=true "htop output when idling")
