@@ -200,7 +200,7 @@ Depending on what SBC you use you might want to lower your camera resolution, fo
 I did not get the camera motion schedule to work unfortunately. Even if you ensure start time is lower then end time. I found it more convenient to setup a cron schedule when to start and stop the motioneye service (with the camera configured to directly react on motion).
 
 ```
-# crontab -e
+# sudo crontab -e
 
 # Every day at 9:00 in the morning stop our motioneye service
 0 9 * * *  systemctl stop motioneye
