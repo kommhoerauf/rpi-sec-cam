@@ -101,7 +101,7 @@ chmod 777 sim7600_4G_hat_init
 ```
 
 Optional : If you intend to play around with the scripts the manufacturer provides (e.g. sending SMS, Phone call or TCP tests) you can also compile the example code.
-These scripts work by directly sending commands to the module. They are a good starting point if you want to setup more comples use-cases, scenarios.
+These scripts work by directly sending commands to the module. They are a good starting point if you want to setup more complex use-cases or scenarios.
 
 ```
 # Go to the bcm2835 directory, compile and install it
@@ -197,10 +197,22 @@ The camera integration is also easily done, the configuration options of the sof
 I have saved myself a few variants of the camera configuration from /etc/motioneye directory (versions with and without motion detection and working schedule) so I can turn things on or off from the distance without needing an UI.
 Depending on what SBC you use you might want to lower your camera resolution, for the Raspberry Pi Zero I have gone with the lowest (320x200 & 2 fps).
 
+I did not get the camera motion schedule to work unfortunately. Even if you ensure start time is lower then end time. I found it more convenient to setup a cron schedule when to start and stop the motioneye service (with the camera configured to directly react on motion).
+
+```
+# crontab -e
+
+# Every day at 9:00 in the morning stop our motioneye service
+0 9 * * *  systemctl stop motioneye
+
+# Every day at 21:00 in the night start our motioneye service
+0 21 * * * systemctl start motioneye
+```
+
 #### Telegram integration
 
 * Setting up telegram bot
-TBD
+There are plenty of examples online howto create a telegram bot. In the end you will need the bot token and keep it stored securely for any future interaction with your bot.
 
 * Installation and configuration of telegram-send
 Its very well explained on their package page : https://pypi.org/project/telegram-send/
@@ -232,6 +244,16 @@ teleterm:
 whitelist:
   - 123456789
 ```
+
+In case you prefer to work with a remote ssh tunnel thats also totally fine. (or in combination with the teleterm if you just want the ssh tunnel on demand) 
+
+```
+local_port=22
+#local_port=8765
+remote_port= 8080
+ssh -o StrictHostChecking=no -R ${local_port}:127.0.0.1:${remote_port} user@remote.host.de -N -f
+```
+
 
 #### Performance
 
