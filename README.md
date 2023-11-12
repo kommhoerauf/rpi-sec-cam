@@ -6,10 +6,10 @@ The whole motivation behind it was to get a small LTE security camera for the ga
 We do not have wifi in the allotment, so the choice was using the mobile network to alert us on any movements instead.
 This should just be some inspiration towards you, in the end you do not have to build a full blown system as we did here but just pick some pieces you might need.
 
-The smaller project based on a RPI ZERO : 
-![Finished Raspberry Pi Zero LTE securiy camera in a wood box](pictures/RPI_ZERO_SEC_CAM.png?raw=true "RPI Zero LTE security camera")
-The bigger project based on a RPI 3 A :
-![Finished Raspberry Pi 3 A LTE securiy camera in a wood box](pictures/RPI_A_SEC_CAM.png?raw=true "RPI 3 A LTE security camera")
+* The smaller project based on a RPI ZERO : 
+* ![Finished Raspberry Pi Zero LTE securiy camera in a wood box](pictures/RPI_ZERO_SEC_CAM.png?raw=true "RPI Zero LTE security camera")
+* The bigger project based on a RPI 3 A :
+* ![Finished Raspberry Pi 3 A LTE securiy camera in a wood box](pictures/RPI_A_SEC_CAM.png?raw=true "RPI 3 A LTE security camera")
 
 What you might need : 
 * A Raspberry Pi single board computer (or other comparable SBCs, for this project I am using a Raspberry Pi Zero W) ~ 20€
