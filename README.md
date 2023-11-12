@@ -6,12 +6,14 @@ The whole motivation behind it was to get a small LTE security camera for the ga
 We do not have wifi in the allotment, so the choice was using the mobile network to alert us on any movements instead.
 This should just be some inspiration towards you, in the end you do not have to build a full blown system as we did here but just pick some pieces you might need.
 
-![Finished Raspberry Pi Zero LTE securiy camera in a wood box](pictures/finished.png?raw=true "RPI Zero LTE security camera")
+The smaller project based on a RPI ZERO : 
+![Finished Raspberry Pi Zero LTE securiy camera in a wood box](pictures/RPI_ZERO_SEC_CAM.png?raw=true "RPI Zero LTE security camera")
+The bigger project based on a RPI 3 A :
 ![Finished Raspberry Pi 3 A LTE securiy camera in a wood box](pictures/RPI_A_SEC_CAM.png?raw=true "RPI 3 A LTE security camera")
 
 What you might need : 
 * A Raspberry Pi single board computer (or other comparable SBCs, for this project I am using a Raspberry Pi Zero W) ~ 20€
-  * Later we switched to a Raspberry Pi 3 A later (as we added more and more RAM hungry tools over the time) ~ 40€
+  * Later we switched to a Raspberry Pi 3 A (as we added more and more RAM hungry tools over the time) ~ 40€
 * A micro SD card (which we use to install Raspbian (Debian 11) 32 bit OS, I have gone with 32GB to have some space for media files) ~ 10€
   * Later we switched to a MSATA SSD connected via USB (to have a longer lifetime of the disk) ~ 30€
 * A micro USB cable to provide power to our SBC (I chose a 1A USB wall charger) ~ 10€
@@ -92,7 +94,7 @@ Assuming you have already prepared the following :
 * Set the correct jumper positions (to configure the module for Raspberry Pi and boot it up at the same time)
 * Connected an USB cable from Raspberry Pi towards the LTE modem.
 
-![Not yet finished Raspberry Pi Zero LTE securiy camera in a wood box](pictures/unfinished.png?raw=true "Not yet ready RPI LTE security camera")
+![Not yet finished Raspberry Pi Zero LTE securiy camera in a wood box](pictures/RPI_ZERO_SEC_CAM_UNFINISHED.png?raw=true "Not yet ready RPI LTE security camera")
 
 Also see https://www.waveshare.com/wiki/SIM7600E-H_4G_HAT
 
@@ -399,6 +401,6 @@ As for the time schedule, you can also just extend the crontab to also turn on y
 
 In the end the CPU/Memory usage is ok when idling, but if motioneye captures videos/pictures the Raspberry Pi noticeable slows down (if you are limited to 1 core as with the Raspberry Pi Zero).
 
-![htop terminal output of Raspberry Pi Zero when idling](pictures/htop.png?raw=true "htop output when idling")
+![htop terminal output of Raspberry Pi Zero when idling](pictures/RPI_ZERO_HTOP.png?raw=true "htop output when idling")
 
 When there is movement in front of the camera cpu usage spikes up to 80% for me, afterwards if a video is being recorded + saved we already hit 100% for a short duration. If you have a more powerful Pi (e.g. the 3 A+) you will see not issues if you keep the video resolution at a lower lower (e.g. around 800x600).
