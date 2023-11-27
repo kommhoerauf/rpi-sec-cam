@@ -3,7 +3,7 @@
 Welcome to this small project.
 
 The whole motivation behind it was to get a small LTE security camera for the garden for which we do not need to pay a lot of money.
-We do not have wifi in the allotment, so the choice was using the mobile network to alert us on any movements instead.
+We do not have wifi in the allotment, so the choice was using the cellular network to alert us on any movements instead.
 This should just be some inspiration towards you, in the end you do not have to build a full blown system as we did here but just pick some pieces you might need.
 
 * The smaller project based on a RPI ZERO : 
@@ -18,11 +18,12 @@ What you might need :
   * Later we switched to a MSATA SSD connected via USB (to have a longer lifetime of the disk) ~ 30€
 * A micro USB cable to provide power to our SBC (I chose a 1A USB wall charger) ~ 10€
   * Later we switched to a more powerful adapter 4A (as we also wanted to power a sirene) ~ 20€
+    * This adapter did hold for about half a year and died, we then switched to an official Rasberry Pi power adapter (we frequently saw the underoltage alerts and the board crashed frequently)
 * A LTE modem compatible with your SBC (for this project I have chosen the SIM7600X-4G-HAT (would also have been possible to choose the specific variant for the Pi Zero (SIM7600G-H))) ~ 90€
 * A USB cable to connect the LTE Modem to our SBC (Had to use this as I was not being able to get the LTE connection working without it, only got GSM working with IO pins) ~ 0€, its included for the SIM7600X, but depending on your container for the camera you might need angled connectors (as I did)
 * A SIM card to be used with the LTE modem (I have chosen to go the cheapest german mobile phone provider plan (~200 MB free per month but getting ads)) ~ 0€ (depending on your mobile network provider you have monthly costs)
 * A Raspberry Pi camera (I used the Raspberry Pi Zero camera without IR filter) ~ 10€
-  * Later we switched to a nightvision camera + infrared LED ~ 20€
+  * Later we switched to a nightvision camera + infrared LED ~ 20€ 
 * A container for everything (I chose a small and tightly fitting wood box for this) ~ 5€
 
 Software we will make use of : 
@@ -39,7 +40,7 @@ Optional hardware additions :
 * A 12V sirene
 * Magnetic door/window sensor
 * Infrared motion sensor
-* various GPIO connecters (female to female and female to male)
+* Various GPIO connecters (female to female and female to male)
 
 If you have the space I would recommend to use a Raspberry Pi 3 or 4 together with a SSD for storage instead of a SD card.
 A lot of writes on the SD card will render it useless quite fast. You may also think about storing the media files of motioneye on an online storage instead.
@@ -221,7 +222,7 @@ Depending on what SBC you use you might want to lower your camera resolution, fo
 
 #### Cron schedules
 
-I did not get the camera motion schedule to work unfortunately. Even if you ensure start time is lower then end time. I found it more convenient to setup a cron schedule when to start and stop the motioneye service (with the camera configured to directly react on motion).
+I did not get the camera motion schedule to work unfortunately. Even if you ensure start time is lower then end time. I found it more convenient to setup a cron schedule when to start and stop the motioneye service (with the camera configured to directly react on motion). Using this approach a later integration of the door and infrared sensors was a piece of cake.
 
 ```
 # sudo crontab -e
@@ -396,6 +397,75 @@ GPIO.output(18,GPIO.LOW)
 
 Save the scripts somewhere (e.g. /usr/bin) where we can simply call them from everywhere.
 As for the time schedule, you can also just extend the crontab to also turn on your LED lights whenever you like.
+
+
+#### (Optional) - microcontroller for hard resets
+
+You 
+
+In the end we want to setup a heartbeat between our Raspberry Pi A and the Microcontroller (e.g. Raspberry Pi Pico). We chose GPIO pin 19 on the Raspberry Pi A and GPIO pin 17 on the microcontroller side.
+We have configured an additional GPIO pin 25 to listen for a stop signal to our heartbeats (e.g. If the internet connection is gone which you check via a separate script and you want to trigger a reboot). GPIO pin 16 on the microcontroller side is controlling a 3,3v Relay to cut off the power to our Raspberry Pi A.
+
+Here is the Raspberry Pi A part : 
+
+```
+#!/usr/bin/env python3
+import RPi.GPIO as GPIO
+import time
+import subprocess
+
+GPIO.setmode(GPIO.BCM)
+heartbeat_pin = 19
+stop_heartbeat_pin = 25
+time_threshold = 30
+GPIO.setup(heartbeat_pin, GPIO.OUT)
+GPIO.setup(stop_heartbeat_pin, GPIO.IN)
+while True:
+        if GPIO.input(stop_heartbeat_pin) == GPIO.HIGH:
+            GPIO.output(heartbeat_pin, GPIO.LOW)
+            while GPIO.input(stop_heartbeat_pin) == GPIO.HIGH:
+                time.sleep(5)
+                elapsed_time = time.time() - start_time
+                if elapsed_time >= time_threshold:
+                    subprocess.call(["sudo", "shutdown", "-h", "now"])
+        else:
+            GPIO.output(heartbeat_pin, GPIO.HIGH)
+            time.sleep(5)
+            GPIO.output(heartbeat_pin, GPIO.LOW)
+            time.sleep(5)
+```
+
+Here is the Raspberry Pi Pico part : 
+
+```
+from machine import Pin
+import time
+
+heartbeatpin = Pin(17, Pin.IN)
+relaypin = Pin(16, Pin.OUT)
+led = Pin("LED", Pin.OUT)
+no_change_count = 0
+last_state = heartbeatpin.value()
+while True:
+    current_state = heartbeatpin.value()
+    if current_state == last_state:
+        no_change_count += 1
+    else:
+        no_change_count = 0
+    last_state = current_state
+    if no_change_count >= 1:
+       led.value(1)
+    else:
+        led.value(not led.value())
+    if no_change_count >= 1800:
+        time.sleep(180)
+        relaypin.value(1)
+        led.value(0)
+        time.sleep(60)
+        relaypin.value(0)
+        no_change_count = 0
+    time.sleep(1)
+```
 
 #### A few words about the performance
 
